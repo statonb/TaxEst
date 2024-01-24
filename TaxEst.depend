@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1705599138 source:/mnt/omv1share1/Workspace/TaxEst/TaxEst.cpp
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<stdarg.h>
+	<string.h>
+	<getopt.h>
+
