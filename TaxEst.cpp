@@ -6,7 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.01";
+const char *SW_VERSION =    "1.02";
+const char *SW_DATE =       "2024-01-24";
 
 #define NUM_BRACKETS        (7)
 typedef enum
@@ -71,11 +72,11 @@ void usage(const char *prog, const char *extraLine = (const char *)(NULL));
 
 void usage(const char *prog, const char *extraLine)
 {
-    fprintf(stderr, "%s Ver %s\n", prog, SW_VERSION);
+    fprintf(stderr, "%s Ver %s %s\n", prog, SW_VERSION, SW_DATE);
     fprintf(stderr, "usage: %s <options>\n", prog);
     fprintf(stderr, "-f filingStatus           0 = SINGLE, 1 = MFJ\n");
     fprintf(stderr, "-y taxYear                2023 or 2024\n");
-    fprintf(stderr, "-i taxable income\n");
+    fprintf(stderr, "-i (or -t) taxable income\n");
     fprintf(stderr, "-g gross income           enter if you want effective tax rate calculation.\n");
     fprintf(stderr, "-q quiet                  print tax only\n");
     if (extraLine) fprintf(stderr, "\n%s\n", extraLine);
@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
         {"filingStatus",    required_argument,  0,      'f'}
         ,{"year",           required_argument,  0,      'y'}
         ,{"income",         required_argument,  0,      'i'}
+        ,{"taxable",        required_argument,  0,      't'}
         ,{"gross",          required_argument,  0,      'g'}
         ,{"quiet",          no_argument,        0,      'q'}
         ,{0,0,0,0}
@@ -107,7 +109,7 @@ int main(int argc, char *argv[])
     while (1)
     {
         int optionIndex = 0;
-        opt = getopt_long(argc, argv, "f:y:i:g:qh?", longOptions, &optionIndex);
+        opt = getopt_long(argc, argv, "f:y:i:t:g:qh?", longOptions, &optionIndex);
 
         if (-1 == opt) break;
 
@@ -134,6 +136,7 @@ int main(int argc, char *argv[])
             }
             break;
         case 'i':
+        case 't':
             taxableIncome = strtoul(optarg, NULL, 10);
             if  (   (taxableIncome == 0)
                  || (taxableIncome > 999999)
