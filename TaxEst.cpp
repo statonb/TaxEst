@@ -6,10 +6,17 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.02";
+const char *SW_VERSION =    "1.10";
 const char *SW_DATE =       "2024-01-24";
 
+#define MULTI_ELEMENT_TEST  (0)
+
+#define ARRAY_METHOD        (1)
+
 #define NUM_BRACKETS        (7)
+#define FIRST_YEAR          (2023)
+#define LAST_YEAR           (2024)
+
 typedef enum
 {
     FILING_STATUS_SINGLE    =   0
@@ -24,6 +31,115 @@ typedef struct
     uint32_t    upperLimit;
 }   bracketElement_t;
 
+#if MULTI_ELEMENT_TEST
+int multiElementArray[3][3][3] =
+{
+    {
+        {
+            10,     //0,0,0
+            20,     //0,0,1
+            30      //0,0,2
+        },
+        {
+            100,    //0,1,0
+            200,    //0,1,1
+            300     //0,1,2
+        },
+        {
+            1000,   //0,2,0
+            2000,   //0,2,1
+            3000    //0,2,2
+        }
+    },
+    {
+        {
+            11,
+            21,
+            31
+        },
+        {
+            101,
+            201,
+            301
+        },
+        {
+            1001,
+            2001,
+            3001
+        }
+    },
+    {
+        {
+            12,
+            22,
+            32
+        },
+        {
+            102,
+            202,
+            302
+        },
+        {
+            1002,
+            2002,
+            3002
+        }
+    }
+};
+#endif // MULTI_ELEMENT_TEST
+
+#if (ARRAY_METHOD == 1)
+bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_BRACKETS] =
+{
+    {
+        // 2023
+        {
+            //  2023 Single
+            {.10,   0,        11000},
+            {.12,   11001,    44725},
+            {.22,   44726,    95375},
+            {.24,   95376,    182100},
+            {.32,   182101,   231250},
+            {.35,   231251,   578125},
+            {.37,   578126,   999999}
+        },
+        {
+            //  2023 MFJ
+            {.10,   0,         22000},
+            {.12,   22001,     89450},
+            {.22,   89451,     190750},
+            {.24,   190751,    364200},
+            {.32,   364201,    462500},
+            {.35,   462501,    693750},
+            {.37,   693751,    999999}
+        }
+    },
+    {
+        // 2024
+        {
+            //  2024 Single
+            {.10,   0,        11600},
+            {.12,   11601,    47150},
+            {.22,   47151,    100525},
+            {.24,   100526,   191950},
+            {.32,   191951,   243725},
+            {.35,   243726,   609350},
+            {.37,   690351,   999999}
+        },
+        {
+            //  2024 MFJ
+            {.10,   0,         23200},
+            {.12,   23201,     94300},
+            {.22,   94301,     201050},
+            {.24,   201051,    383900},
+            {.32,   383901,    487450},
+            {.35,   487451,    731200},
+            {.37,   731201,    999999}
+        }
+    }
+};
+
+#else
 bracketElement_t    taxBracket_SINGLE_2023[NUM_BRACKETS] =
 {
     {.10,   0,        11000},
@@ -67,6 +183,7 @@ bracketElement_t    taxBracket_MFJ_2024[NUM_BRACKETS] =
     {.35,   487451,    731200},
     {.37,   731201,    999999}
 };
+#endif
 
 void usage(const char *prog, const char *extraLine = (const char *)(NULL));
 
@@ -82,6 +199,13 @@ void usage(const char *prog, const char *extraLine)
     if (extraLine) fprintf(stderr, "\n%s\n", extraLine);
 }
 
+#if MULTI_ELEMENT_TEST
+int main(int argc, char *argv[])
+{
+    printf("0,2,2 = %d\n", multiElementArray[0][2][2]);
+    return 0;
+}
+#else
 int main(int argc, char *argv[])
 {
     int                 opt;
@@ -128,8 +252,8 @@ int main(int argc, char *argv[])
             break;
         case 'y':
             taxYear = strtoul(optarg, NULL, 10);
-            if  (   (taxYear < 2023)
-                 || (taxYear > 2024)
+            if  (   (taxYear < FIRST_YEAR)
+                 || (taxYear > LAST_YEAR)
                 )
             {
                 usageError = true;
@@ -174,6 +298,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    #if (ARRAY_METHOD == 1)
+    pTaxBracket = taxBrackets[taxYear - FIRST_YEAR][filingStatus];
+    #else
     switch (taxYear)
     {
         case 2023:
@@ -187,6 +314,7 @@ int main(int argc, char *argv[])
             return -1;
             break;
     }
+    #endif
 
     while (taxableIncome > pTaxBracket->upperLimit)
     {
@@ -217,3 +345,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+#endif
