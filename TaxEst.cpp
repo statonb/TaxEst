@@ -17,7 +17,7 @@ const char *SW_DATE =       "2024-02-04";
 #define FIRST_YEAR          (2023)
 #define LAST_YEAR           (2024)
 
-#define MAX_UPPER_LIMIT     (999999)
+#define MAX_UPPER_LIMIT     (9999999)
 
 typedef enum
 {
@@ -103,7 +103,7 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.24,   95376,    182100},
             {.32,   182101,   231250},
             {.35,   231251,   578125},
-            {.37,   578126,   MAX_UPPER_LIMIT}
+            {.37,   578126,   MAX_UPPER_LIMIT-2}
         },
         {
             //  2023 MFJ
@@ -113,7 +113,7 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.24,   190751,    364200},
             {.32,   364201,    462500},
             {.35,   462501,    693750},
-            {.37,   693751,    MAX_UPPER_LIMIT}
+            {.37,   693751,    MAX_UPPER_LIMIT-2}
         }
     },
     {
@@ -126,7 +126,7 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.24,   100526,   191950},
             {.32,   191951,   243725},
             {.35,   243726,   609350},
-            {.37,   690351,   MAX_UPPER_LIMIT}
+            {.37,   609351,   MAX_UPPER_LIMIT-2}
         },
         {
             //  2024 MFJ
@@ -136,7 +136,7 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.24,   201051,    383900},
             {.32,   383901,    487450},
             {.35,   487451,    731200},
-            {.37,   731201,    MAX_UPPER_LIMIT}
+            {.37,   731201,    MAX_UPPER_LIMIT-2}
         }
     }
 };
