@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.11";
-const char *SW_DATE =       "2024-02-04";
+const char *SW_VERSION =    "1.20";
+const char *SW_DATE =       "2024-10-22";
 
 #define MULTI_ELEMENT_TEST  (0)
 
@@ -15,7 +15,7 @@ const char *SW_DATE =       "2024-02-04";
 
 #define NUM_BRACKETS        (7)
 #define FIRST_YEAR          (2023)
-#define LAST_YEAR           (2024)
+#define LAST_YEAR           (2025)
 
 #define MAX_UPPER_LIMIT     (9999999)
 
@@ -138,6 +138,29 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.35,   487451,    731200},
             {.37,   731201,    MAX_UPPER_LIMIT-2}
         }
+    },
+    {
+        // 2025
+        {
+            //  2025 Single
+            {.10,   0,        11925},
+            {.12,   11926,    48475},
+            {.22,   48476,    103350},
+            {.24,   103351,   197300},
+            {.32,   197301,   250525},
+            {.35,   250526,   625350},
+            {.37,   625351,   MAX_UPPER_LIMIT-2}
+        },
+        {
+            //  2025 MFJ
+            {.10,   0,         23850},
+            {.12,   23851,     96950},
+            {.22,   96951,     206700},
+            {.24,   206701,    394600},
+            {.32,   394601,    501050},
+            {.35,   501051,    751600},
+            {.37,   751601,    MAX_UPPER_LIMIT-2}
+        }
     }
 };
 
@@ -194,7 +217,7 @@ void usage(const char *prog, const char *extraLine)
     fprintf(stderr, "%s Ver %s %s\n", prog, SW_VERSION, SW_DATE);
     fprintf(stderr, "usage: %s <options>\n", prog);
     fprintf(stderr, "-f filingStatus           0 = SINGLE, 1 = MFJ\n");
-    fprintf(stderr, "-y taxYear                2023 or 2024\n");
+    fprintf(stderr, "-y taxYear                2023 - 2025\n");
     fprintf(stderr, "-i (or -t) taxable income\n");
     fprintf(stderr, "-g gross income           enter if you want effective tax rate calculation.\n");
     fprintf(stderr, "-q quiet                  print tax only\n");
