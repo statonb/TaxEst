@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.20";
-const char *SW_DATE =       "2024-10-22";
+const char *SW_VERSION =    "1.30";
+const char *SW_DATE =       "2025-03-13";
 
 #define MULTI_ELEMENT_TEST  (0)
 
@@ -219,8 +219,13 @@ void usage(const char *prog, const char *extraLine)
     fprintf(stderr, "-f filingStatus           0 = SINGLE, 1 = MFJ\n");
     fprintf(stderr, "-y taxYear                2023 - 2025\n");
     fprintf(stderr, "-i (or -t) taxable income\n");
+    fprintf(stderr, "-q (or -d) qualified dividends\n");
+    fprintf(stderr, "                          Ammount of taxable income that is qualified dividends.\n");
+    fprintf(stderr, "                          Assumes 15%% tax rate.\n");
+    fprintf(stderr, "                          Include this ammount in the total taxable income.\n");
+    fprintf(stderr, "                          If tax rate is 0%% then leave it out of the income.\n");
     fprintf(stderr, "-g gross income           enter if you want effective tax rate calculation.\n");
-    fprintf(stderr, "-q quiet                  print tax only\n");
+    fprintf(stderr, "--quiet                   print tax only\n");
     if (extraLine) fprintf(stderr, "\n%s\n", extraLine);
 }
 
@@ -241,6 +246,7 @@ int main(int argc, char *argv[])
     filingStatus_t      filingStatus = NUM_FILING_STATUS;
     uint32_t            taxYear = 0;
     uint32_t            taxableIncome = 0;
+    uint32_t            qualifiedDividends = 0;
     uint32_t            grossIncome = 0;
     uint32_t            temp;
 
@@ -249,16 +255,18 @@ int main(int argc, char *argv[])
         {"filingStatus",    required_argument,  0,      'f'}
         ,{"year",           required_argument,  0,      'y'}
         ,{"income",         required_argument,  0,      'i'}
+        ,{"dividends",      required_argument,  0,      'd'}
+        ,{"qualified",      required_argument,  0,      'q'}
         ,{"taxable",        required_argument,  0,      't'}
         ,{"gross",          required_argument,  0,      'g'}
-        ,{"quiet",          no_argument,        0,      'q'}
+        ,{"quiet",          no_argument,        0,      128}
         ,{0,0,0,0}
     };
 
     while (1)
     {
         int optionIndex = 0;
-        opt = getopt_long(argc, argv, "f:y:i:t:g:qh?", longOptions, &optionIndex);
+        opt = getopt_long(argc, argv, "f:y:i:q:d:t:g:h?", longOptions, &optionIndex);
 
         if (-1 == opt) break;
 
@@ -282,10 +290,14 @@ int main(int argc, char *argv[])
         case 't':
             taxableIncome = strtoul(optarg, NULL, 10);
             break;
+        case 'd':
+        case 'q':
+            qualifiedDividends = strtoul(optarg, NULL, 10);
+            break;
         case 'g':
             grossIncome = strtoul(optarg, NULL, 10);
             break;
-        case 'q':
+        case 128:
             quietFlag = true;
             break;
         case 'h':
@@ -338,6 +350,11 @@ int main(int argc, char *argv[])
         case 2024:
             pTaxBracket = (FILING_STATUS_SINGLE == filingStatus) ? taxBracket_SINGLE_2024 : taxBracket_MFJ_2024;
             break;
+        case 2025:
+            // Should use ARRAY_METHOD 1.
+            // If switching to something else, these other tax tables need to be defined.
+            pTaxBracket = (FILING_STATUS_SINGLE == filingStatus) ? taxBracket_SINGLE_2025 : taxBracket_MFJ_2025;
+            break;
         default:
             usage(basename(argv[0]));
             return -1;
@@ -352,6 +369,12 @@ int main(int argc, char *argv[])
     }
     tax += (double)(taxableIncome - pTaxBracket->lowerLimit) * pTaxBracket->rate;
 
+    // Adjust for qualified dividends
+    if (pTaxBracket->rate > 0.15)
+    {
+        tax -= (double)qualifiedDividends * (pTaxBracket->rate - 0.15);
+    }
+
     if (false == quietFlag)
     {
         printf("Tax Year      : %d\n", taxYear);
@@ -359,6 +382,10 @@ int main(int argc, char *argv[])
             ,(FILING_STATUS_SINGLE == filingStatus) ? "Single" : "MFJ"
             );
         printf("Taxable Income: $%d\n", taxableIncome);
+        if (qualifiedDividends > 0)
+        {
+            printf("Qualified Div : $%d\n", qualifiedDividends);
+        }
         printf("Marginal Rate : %.0lf%%\n", pTaxBracket->rate * 100.0);
         if (grossIncome > 0)
         {
