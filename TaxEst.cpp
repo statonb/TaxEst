@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.30";
-const char *SW_DATE =       "2025-03-13";
+const char *SW_VERSION =    "1.31";
+const char *SW_DATE =       "2025-06-18";
 
 #define MULTI_ELEMENT_TEST  (0)
 
@@ -220,8 +220,9 @@ void usage(const char *prog, const char *extraLine)
     fprintf(stderr, "-y taxYear                2023 - 2025\n");
     fprintf(stderr, "-i (or -t) taxable income\n");
     fprintf(stderr, "-q (or -d) qualified dividends\n");
-    fprintf(stderr, "                          Ammount of taxable income that is qualified dividends.\n");
-    fprintf(stderr, "                          Assumes 15%% tax rate.\n");
+    fprintf(stderr, "-l         long-term cap gains\n");
+    fprintf(stderr, "                          Ammount of taxable income that is qualified dividends\n");
+    fprintf(stderr, "                          or long-term capital gains to be taxed at 15%%.\n");
     fprintf(stderr, "                          Include this ammount in the total taxable income.\n");
     fprintf(stderr, "                          If tax rate is 0%% then leave it out of the income.\n");
     fprintf(stderr, "-g gross income           enter if you want effective tax rate calculation.\n");
@@ -247,6 +248,7 @@ int main(int argc, char *argv[])
     uint32_t            taxYear = 0;
     uint32_t            taxableIncome = 0;
     uint32_t            qualifiedDividends = 0;
+    uint32_t            ltcg = 0;
     uint32_t            grossIncome = 0;
     uint32_t            temp;
 
@@ -257,6 +259,7 @@ int main(int argc, char *argv[])
         ,{"income",         required_argument,  0,      'i'}
         ,{"dividends",      required_argument,  0,      'd'}
         ,{"qualified",      required_argument,  0,      'q'}
+        ,{"ltcg",           required_argument,  0,      'l'}
         ,{"taxable",        required_argument,  0,      't'}
         ,{"gross",          required_argument,  0,      'g'}
         ,{"quiet",          no_argument,        0,      128}
@@ -266,7 +269,7 @@ int main(int argc, char *argv[])
     while (1)
     {
         int optionIndex = 0;
-        opt = getopt_long(argc, argv, "f:y:i:q:d:t:g:h?", longOptions, &optionIndex);
+        opt = getopt_long(argc, argv, "f:y:i:q:d:l:t:g:h?", longOptions, &optionIndex);
 
         if (-1 == opt) break;
 
@@ -293,6 +296,9 @@ int main(int argc, char *argv[])
         case 'd':
         case 'q':
             qualifiedDividends = strtoul(optarg, NULL, 10);
+            break;
+        case 'l':
+            ltcg = strtoul(optarg, NULL, 10);
             break;
         case 'g':
             grossIncome = strtoul(optarg, NULL, 10);
@@ -370,6 +376,7 @@ int main(int argc, char *argv[])
     tax += (double)(taxableIncome - pTaxBracket->lowerLimit) * pTaxBracket->rate;
 
     // Adjust for qualified dividends
+    qualifiedDividends += ltcg;         // Treat ltcg the same as qualified dividends
     if (pTaxBracket->rate > 0.15)
     {
         tax -= (double)qualifiedDividends * (pTaxBracket->rate - 0.15);
