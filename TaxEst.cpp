@@ -15,7 +15,7 @@ const char *SW_DATE =       "2025-06-18";
 
 #define NUM_BRACKETS        (7)
 #define FIRST_YEAR          (2023)
-#define LAST_YEAR           (2025)
+#define LAST_YEAR           (2026)
 
 #define MAX_UPPER_LIMIT     (9999999)
 
@@ -160,6 +160,29 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.32,   394601,    501050},
             {.35,   501051,    751600},
             {.37,   751601,    MAX_UPPER_LIMIT-2}
+        }
+    },
+    {
+        // 2026
+        {
+            //  2026 Single
+            {.10,   0,        12341},
+            {.12,   12342,    50142},
+            {.22,   50143,    104938},
+            {.24,   104939,   200335},
+            {.32,   200336,   254394},
+            {.35,   254395,   635985},
+            {.37,   635986,   MAX_UPPER_LIMIT-2}
+        },
+        {
+            //  2026 MFJ
+            {.10,   0,         24682},
+            {.12,   24683,     100284},
+            {.22,   100285,    209875},
+            {.24,   209876,    400671},
+            {.32,   400672,    508788},
+            {.35,   508789,    763182},
+            {.37,   763183,    MAX_UPPER_LIMIT-2}
         }
     }
 };
