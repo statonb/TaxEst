@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.32";
-const char *SW_DATE =       "2025-10-10";
+const char *SW_VERSION =    "1.33";
+const char *SW_DATE =       "2025-11-02";
 
 #define MULTI_ELEMENT_TEST  (0)
 
@@ -240,7 +240,7 @@ void usage(const char *prog, const char *extraLine)
     fprintf(stderr, "%s Ver %s %s\n", prog, SW_VERSION, SW_DATE);
     fprintf(stderr, "usage: %s <options>\n", prog);
     fprintf(stderr, "-f filingStatus           0 = SINGLE, 1 = MFJ\n");
-    fprintf(stderr, "-y taxYear                2023 - 2025\n");
+    fprintf(stderr, "-y taxYear                %d - %d\n", FIRST_YEAR, LAST_YEAR);
     fprintf(stderr, "-i (or -t) taxable income\n");
     fprintf(stderr, "-q (or -d) qualified dividends\n");
     fprintf(stderr, "-l         long-term cap gains\n");
