@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 
-const char *SW_VERSION =    "1.33";
-const char *SW_DATE =       "2025-11-02";
+const char *SW_VERSION =    "1.34";
+const char *SW_DATE =       "2026-09-05";
 
 #define MULTI_ELEMENT_TEST  (0)
 
@@ -15,7 +15,7 @@ const char *SW_DATE =       "2025-11-02";
 
 #define NUM_BRACKETS        (7)
 #define FIRST_YEAR          (2023)
-#define LAST_YEAR           (2026)
+#define LAST_YEAR           (2027)
 
 #define MAX_UPPER_LIMIT     (9999999)
 
@@ -184,6 +184,29 @@ bracketElement_t    taxBrackets[LAST_YEAR-FIRST_YEAR+1][NUM_FILING_STATUS][NUM_B
             {.35,   512451,    768700},
             {.37,   768701,    MAX_UPPER_LIMIT-2}
         }
+    },
+    {
+        // 2027 *** ESTIMATED ***
+        {
+            //  2027 Single *** ESTIMATED ***
+            {.10,   0,        12800},
+            {.12,   12801,    52025},
+            {.22,   52026,    109125},
+            {.24,   109126,   208325},
+            {.32,   208326,   264550},
+            {.35,   264551,   661375},
+            {.37,   661376,   MAX_UPPER_LIMIT-2}
+        },
+        {
+            //  2027 MFJ *** ESTIMATED ***
+            {.10,   0,         25600},
+            {.12,   25601,     104050},
+            {.22,   104051,    218250},
+            {.24,   218251,    416650},
+            {.32,   416651,    529100},
+            {.35,   529101,    793650},
+            {.37,   793651,    MAX_UPPER_LIMIT-2}
+        }
     }
 };
 
@@ -239,7 +262,7 @@ void usage(const char *prog, const char *extraLine)
 {
     fprintf(stderr, "%s Ver %s %s\n", prog, SW_VERSION, SW_DATE);
     fprintf(stderr, "usage: %s <options>\n", prog);
-    fprintf(stderr, "-f filingStatus           0 = SINGLE, 1 = MFJ\n");
+    fprintf(stderr, "-f filingStatus           1 = SINGLE, 2 = MFJ\n");
     fprintf(stderr, "-y taxYear                %d - %d\n", FIRST_YEAR, LAST_YEAR);
     fprintf(stderr, "-i (or -t) taxable income\n");
     fprintf(stderr, "-q (or -d) qualified dividends\n");
@@ -300,13 +323,15 @@ int main(int argc, char *argv[])
         {
         case 'f':
             temp = strtoul(optarg, NULL, 10);
-            if (temp >= NUM_FILING_STATUS)
+            if  (   (temp > NUM_FILING_STATUS)
+                 || (temp == 0)
+                )
             {
                 usageError = true;
             }
             else
             {
-                filingStatus = (filingStatus_t)(temp);
+                filingStatus = (filingStatus_t)(temp - 1);
             }
             break;
         case 'y':
@@ -407,7 +432,15 @@ int main(int argc, char *argv[])
 
     if (false == quietFlag)
     {
-        printf("Tax Year      : %d\n", taxYear);
+        printf("Tax Year      : %d", taxYear);
+        if (2027 == taxYear)
+        {
+            printf("\x1b[1;31m  *** ESTIMATED TAX BRACKETS ***\x1b[0m\n");
+        }
+        else
+        {
+            putchar('\n');
+        }
         printf("Filing Status : %s\n"
             ,(FILING_STATUS_SINGLE == filingStatus) ? "Single" : "MFJ"
             );
